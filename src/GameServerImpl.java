@@ -32,6 +32,11 @@ public class GameServerImpl extends UnicastRemoteObject implements GameServerInt
     }
 
     @Override
+    public synchronized int getBoardSize() throws RemoteException {
+        return size;
+    }
+
+    @Override
     public synchronized int checkWin() throws RemoteException {
         // Check rows, columns and diagonals for a winner
         for (int i = 0; i < size; i++) {

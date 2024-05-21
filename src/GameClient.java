@@ -13,20 +13,11 @@ public class GameClient extends JFrame implements ActionListener {
     private PolygonButton[][] buttons;
     private GameServerInterface gameServer;
 
-    public GameClient(int playerId, String serverAddress, int size) {
-        this.playerId = playerId;
-        this.size = size;
-        this.buttons = new PolygonButton[size][size];
+    public GameClient(int playerId, String serverAddress) {
+        connectToServer(serverAddress);
 
-        try {
-            InetAddress addr = InetAddress.getByName(serverAddress);
-            String host = addr.getCanonicalHostName();
-            Registry registry = LocateRegistry.getRegistry(host);
-            gameServer = (GameServerInterface) registry.lookup("GameServer");
-        } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
-            e.printStackTrace();
-        }
+        this.playerId = playerId;
+        this.buttons = new PolygonButton[size][size];
 
         setTitle("Tic Tac Toe - Player " + playerId);
         setSize(500, 500);
@@ -83,6 +74,19 @@ public class GameClient extends JFrame implements ActionListener {
         }
     }
 
+    private void connectToServer(String serverAddress){
+        try {
+            InetAddress addr = InetAddress.getByName(serverAddress);
+            String host = addr.getCanonicalHostName();
+            Registry registry = LocateRegistry.getRegistry(host);
+            gameServer = (GameServerInterface) registry.lookup("GameServer");
+            size = gameServer.getBoardSize();
+        } catch (Exception e) {
+            System.err.println("Client exception: " + e.toString());
+            e.printStackTrace();
+        }
+    }
+
     private void updateBoard() {
         try {
             int[][] board = gameServer.getBoard();
@@ -113,7 +117,6 @@ public class GameClient extends JFrame implements ActionListener {
     public static void main(String[] args) {
         int playerId = Integer.parseInt(args[0]);
         String serverAddress = args[1];
-        int size = 4; // NxN board size
-        SwingUtilities.invokeLater(() -> new GameClient(playerId, serverAddress, size));
+        SwingUtilities.invokeLater(() -> new GameClient(playerId, serverAddress));
     }
 }
