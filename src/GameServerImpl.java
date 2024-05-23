@@ -79,14 +79,4 @@ public class GameServerImpl
   public synchronized void clearBoard() throws RemoteException {
     this.board = new int[size][size];
   }
-
-  @Override
-  public synchronized int getNextPlayer() throws RemoteException {
-    return currentPlayerIndex + 1;
-  }
-
-  @Override
-  public synchronized void registerPlayer(int playerId) throws RemoteException {
-    return;
-  }
 }
