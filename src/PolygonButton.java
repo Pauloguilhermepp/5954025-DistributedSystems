@@ -40,8 +40,7 @@ public class PolygonButton extends JButton {
     polygon.closePath();
 
     g2.setColor(Color.BLACK);
-    g2.setStroke(
-        new BasicStroke(3)); // Set the stroke width for drawing the edges
+    g2.setStroke(new BasicStroke(3));
     g2.draw(polygon);
   }
 }
