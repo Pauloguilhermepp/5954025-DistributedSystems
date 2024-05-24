@@ -21,7 +21,7 @@ public class GameClient extends JFrame implements ActionListener {
     this.buttons = new PolygonButton[size][size];
   }
 
-  public void setGameWindow(){
+  public void setGameWindow() {
     setTitle("Tic Tac Toe - Player " + playerId);
     setSize(500, 500);
     setLayout(new GridLayout(size, size));
@@ -38,7 +38,7 @@ public class GameClient extends JFrame implements ActionListener {
     setVisible(true);
   }
 
-  public void run(){
+  public void run() {
     setGameWindow();
 
     new Thread(() -> {

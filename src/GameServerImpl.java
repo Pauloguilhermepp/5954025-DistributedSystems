@@ -75,8 +75,8 @@ public class GameServerImpl
   @Override
   public synchronized int checkWin() throws RemoteException {
     int winner = getWin();
-    if (winner != 0){
-        clearBoard();
+    if (winner != 0) {
+      clearBoard();
     }
 
     return winner;
