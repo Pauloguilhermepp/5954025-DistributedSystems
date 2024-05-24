@@ -8,6 +8,8 @@ public class GameServerImpl
   private int[][] board;
   private int currentPlayerIndex;
   private int totalPlayers;
+  private int GAME_ONGOING = 0;
+  private int GAME_DRAW = -1;
 
   protected GameServerImpl(int size, int totalPlayers) throws RemoteException {
     super();
@@ -64,10 +66,10 @@ public class GameServerImpl
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < size; j++) {
         if (board[i][j] == 0)
-          return 0; // Game ongoing
+          return GAME_ONGOING;
       }
     }
-    return -1; // Draw
+    return GAME_DRAW;
   }
 
   @Override
