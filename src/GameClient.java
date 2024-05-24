@@ -107,12 +107,6 @@ public class GameClient extends JFrame implements ActionListener {
         buttons[i][j].setSides(0);
       }
     }
-
-    try {
-      gameServer.clearBoard();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
   }
 
   public static void main(String[] args) {

@@ -6,5 +6,4 @@ public interface GameServerInterface extends Remote {
   int[][] getBoard() throws RemoteException;
   int getBoardSize() throws RemoteException;
   int checkWin() throws RemoteException;
-  void clearBoard() throws RemoteException;
 }

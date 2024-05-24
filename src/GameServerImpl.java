@@ -38,8 +38,7 @@ public class GameServerImpl
     return size;
   }
 
-  @Override
-  public synchronized int checkWin() throws RemoteException {
+  private int getWin() throws RemoteException {
     // Check rows, columns and diagonals for a winner
     for (int i = 0; i < size; i++) {
       if (checkLine(board[i]))
@@ -71,12 +70,21 @@ public class GameServerImpl
     return -1; // Draw
   }
 
+  @Override
+  public synchronized int checkWin() throws RemoteException {
+    int winner = getWin();
+    if (winner != 0){
+        clearBoard();
+    }
+
+    return winner;
+  }
+
   private boolean checkLine(int[] line) {
     return Arrays.stream(line).allMatch(x -> x == line[0] && x != 0);
   }
 
-  @Override
-  public synchronized void clearBoard() throws RemoteException {
+  private void clearBoard() throws RemoteException {
     this.board = new int[size][size];
   }
 }
