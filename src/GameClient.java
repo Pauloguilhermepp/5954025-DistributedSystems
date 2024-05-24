@@ -8,17 +8,20 @@ import java.rmi.registry.Registry;
 import javax.swing.*;
 
 public class GameClient extends JFrame implements ActionListener {
-  private int playerId;
   private int size;
+  private int playerId;
+  private String serverAddress;
   private PolygonButton[][] buttons;
   private GameServerInterface gameServer;
 
   public GameClient(int playerId, String serverAddress) {
     connectToServer(serverAddress);
-
     this.playerId = playerId;
+    this.serverAddress = serverAddress;
     this.buttons = new PolygonButton[size][size];
+  }
 
+  public void setGameWindow(){
     setTitle("Tic Tac Toe - Player " + playerId);
     setSize(500, 500);
     setLayout(new GridLayout(size, size));
@@ -33,6 +36,10 @@ public class GameClient extends JFrame implements ActionListener {
 
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     setVisible(true);
+  }
+
+  public void run(){
+    setGameWindow();
 
     new Thread(() -> {
       while (true) {
@@ -112,6 +119,7 @@ public class GameClient extends JFrame implements ActionListener {
   public static void main(String[] args) {
     int playerId = Integer.parseInt(args[0]);
     String serverAddress = args[1];
-    SwingUtilities.invokeLater(() -> new GameClient(playerId, serverAddress));
+    GameClient gameClient = new GameClient(playerId, serverAddress);
+    gameClient.run();
   }
 }
