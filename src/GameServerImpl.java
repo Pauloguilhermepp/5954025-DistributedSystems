@@ -1,6 +1,5 @@
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Arrays;
 
 public class GameServerImpl
     extends UnicastRemoteObject implements GameServerInterface {
@@ -8,15 +7,18 @@ public class GameServerImpl
   private int[][] board;
   private int currentPlayerIndex;
   private int totalPlayers;
+  private int sequenceToWin;
   private int GAME_ONGOING = 0;
   private int GAME_DRAW = -1;
 
-  protected GameServerImpl(int size, int totalPlayers) throws RemoteException {
+  protected GameServerImpl(int size, int totalPlayers, int sequenceToWin)
+      throws RemoteException {
     super();
     this.size = size;
     this.board = new int[size][size];
     this.currentPlayerIndex = 0;
     this.totalPlayers = totalPlayers;
+    this.sequenceToWin = sequenceToWin;
   }
 
   @Override
@@ -41,32 +43,40 @@ public class GameServerImpl
   }
 
   private int getWin() throws RemoteException {
-    // Check rows, columns and diagonals for a winner
+    // Check rows and columns
     for (int i = 0; i < size; i++) {
-      if (checkLine(board[i]))
-        return board[i][0];
-      int[] col = new int[size];
-      for (int j = 0; j < size; j++)
-        col[j] = board[j][i];
-      if (checkLine(col))
-        return col[0];
+      for (int j = 0; j <= size - sequenceToWin; j++) {
+        if (checkSequence(board[i], j, sequenceToWin)) {
+          return board[i][j];
+        }
+        int[] col = new int[size];
+        for (int k = 0; k < size; k++) {
+          col[k] = board[k][i];
+        }
+        if (checkSequence(col, j, sequenceToWin)) {
+          return col[j];
+        }
+      }
     }
-    int[] diag1 = new int[size];
-    int[] diag2 = new int[size];
-    for (int i = 0; i < size; i++) {
-      diag1[i] = board[i][i];
-      diag2[i] = board[i][size - 1 - i];
+
+    // Check diagonals
+    for (int i = 0; i <= size - sequenceToWin; i++) {
+      for (int j = 0; j <= size - sequenceToWin; j++) {
+        if (checkDiagonal(i, j, sequenceToWin, true)) {
+          return board[i][j];
+        }
+        if (checkDiagonal(i, j, sequenceToWin, false)) {
+          return board[i][j + sequenceToWin - 1];
+        }
+      }
     }
-    if (checkLine(diag1))
-      return diag1[0];
-    if (checkLine(diag2))
-      return diag2[0];
 
     // Check for draw or ongoing game
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < size; j++) {
-        if (board[i][j] == 0)
+        if (board[i][j] == 0) {
           return GAME_ONGOING;
+        }
       }
     }
     return GAME_DRAW;
@@ -75,15 +85,41 @@ public class GameServerImpl
   @Override
   public synchronized int checkWin() throws RemoteException {
     int winner = getWin();
-    if (winner != 0) {
+    if (winner != GAME_ONGOING) {
       clearBoard();
     }
-
     return winner;
   }
 
-  private boolean checkLine(int[] line) {
-    return Arrays.stream(line).allMatch(x -> x == line[0] && x != 0);
+  private boolean checkSequence(int[] line, int start, int length) {
+    int player = line[start];
+    if (player == 0)
+      return false;
+    for (int i = start; i < start + length; i++) {
+      if (line[i] != player) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean checkDiagonal(int startRow, int startCol, int length,
+                                boolean isMajor) {
+    int player = board[startRow][startCol];
+    if (player == 0)
+      return false;
+    for (int i = 0; i < length; i++) {
+      if (isMajor) {
+        if (board[startRow + i][startCol + i] != player) {
+          return false;
+        }
+      } else {
+        if (board[startRow + i][startCol + length - 1 - i] != player) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   private void clearBoard() throws RemoteException {
